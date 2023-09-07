@@ -21,20 +21,20 @@ class ChatGPT:
     _driver: webdriver.Chrome
     _logger: logging
 
-    def __init__(self, update_extension: bool = False):
+    def __init__(self, update_extension: bool = False, use_proxy: bool = True):
         logging.basicConfig(filename='ChatGPT_log.log', level=logging.INFO,
                             format='%(asctime)s - %(levelname)s - %(message)s')
         self._logger = logging.getLogger(__name__)
-
-        if update_extension:
-            if os.path.exists('proxy_auth_plugin.zip'):
-                os.remove('proxy_auth_plugin.zip')
-        if not os.path.exists('proxy_auth_plugin.zip'):
-            with zipfile.ZipFile('proxy_auth_plugin.zip', 'w') as zp:
-                zp.writestr('manifest.json', extension.manifest_json)
-                zp.writestr('background.js', extension.background_js)
-
         chrome_options: Options = webdriver.ChromeOptions()
+        if use_proxy:
+            if update_extension:
+                if os.path.exists('proxy_auth_plugin.zip'):
+                    os.remove('proxy_auth_plugin.zip')
+            if not os.path.exists('proxy_auth_plugin.zip'):
+                with zipfile.ZipFile('proxy_auth_plugin.zip', 'w') as zp:
+                    zp.writestr('manifest.json', extension.manifest_json)
+                    zp.writestr('background.js', extension.background_js)
+            chrome_options.add_extension('proxy_auth_plugin.zip')
         chrome_options.add_argument('--window-size=1366,768')
         chrome_options.add_argument('--start-maximized')
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
@@ -53,7 +53,7 @@ class ChatGPT:
         chrome_options.add_argument("--disable-save-password-bubble")  # отключение менеджера сохранения паролей
         chrome_options.add_argument("--disable-translate")
         chrome_options.add_argument("--disable-autofill-dropdown")
-        chrome_options.add_extension('proxy_auth_plugin.zip')
+
         service = Service(config.PATH_TO_DRIVER)
         self._driver = webdriver.Chrome(options=chrome_options, service=service)
         self._logger.info("driver running")
