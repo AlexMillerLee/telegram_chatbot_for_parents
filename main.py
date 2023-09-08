@@ -1,3 +1,4 @@
+import time
 import traceback
 import sys
 from typing import Union
@@ -29,7 +30,6 @@ class Bot_logic():
             self._logger.error(f"Exception: {ex} {traceback.print_exc()}")
             self._chatBot.finish_work()
             sys.exit(0)
-        self._logger.info("success")
 
     def _get_user_status(self, chat_id: int, user_name: str) -> bool:
         if user := self._db.get_user(chat_id):
@@ -67,7 +67,7 @@ class Bot_logic():
 
     def working(self, sleep_time: int = 5) -> None:
         stop_word: bool = True
-        while (stop_word):
+        while stop_word:
             self._logger.info(f"main loop  new iteration")
             messages = self._telegram.get_messages()
             if messages["success"]:
@@ -91,6 +91,21 @@ class Bot_logic():
                             elif text_of_message == config.COMMAND_ADD_NEW_USER:
                                 result = self._send_answer("done", message[0], message[3])
                                 self._logger.info(f"COMMAND_ADD_NEW_USER result of work {result}")
+                            elif text_of_message == config.COMMAND_RESTART_SELENIUM:
+                                self._send_answer("restarting...", message[0], message[3])
+                                restart_status: bool = False
+                                try:
+                                    self._logger.info("restart selenium")
+                                    self._chatBot.finish_work()
+                                    time.sleep(5)
+                                    self._chatBot = chatGPT.ChatGPT(update_extension=False)
+                                    restart_status = self._chatBot.authorization()
+                                except Exception as ex:
+                                    self._logger.error(f"Exception: {ex} {traceback.print_exc()}")
+                                if restart_status:
+                                    self._send_answer("restart success", message[0], message[3])
+                                else:
+                                    self._send_answer("restart fault", message[0], message[3])
                             elif text_of_message == config.COMMAND_STOP_WORD:
                                 result = self._send_answer("bye", message[0], message[3])
                                 self._logger.info(f"COMMAND_STOP_WORD result of work {result}")
