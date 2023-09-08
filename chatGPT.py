@@ -116,7 +116,7 @@ class ChatGPT:
             self._driver.add_cookie(cookie)
         self._driver.refresh()
 
-    def _waiting_answer(self, try_count: int = 10, sleep_time_for_count: int = 2) -> None:
+    def _waiting_answer(self, try_count: int = 20, sleep_time_for_count: int = 2) -> None:
         self._logger.info(f"waiting_answer  start working ")
         for _ in range(try_count):
             if len(self._driver.find_elements(By.CSS_SELECTOR, config.CHAT_GPT_PROCESSING)) > 0:
