@@ -22,9 +22,14 @@ class ChatGPT:
     _logger: logging
 
     def __init__(self, update_extension: bool = False, use_proxy: bool = True):
-        logging.basicConfig(filename='ChatGPT_log.log', level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger("chat_bot_logger")
+        self._logger.setLevel(logging.INFO)
+        handler = logging.FileHandler('ChatGPT_log.log')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
+
+
         chrome_options: Options = webdriver.ChromeOptions()
         if use_proxy:
             if update_extension:

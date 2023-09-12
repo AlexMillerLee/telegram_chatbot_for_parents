@@ -1,3 +1,5 @@
+import traceback
+
 import requests
 import json
 
@@ -28,8 +30,14 @@ class Bot:
             data["offset"] = offset
         if timeout != 0:
             data["timeout"] = timeout
-        response = requests.post(url, headers=headers, params=data)
         result = dict()
+        try:
+            response = requests.post(url, headers=headers, params=data)
+        except Exception as ex:
+            result["data"] = None
+            result["success"] = False
+            result["errors"] = [f"{ex}", f"{traceback.print_exc()}"]
+            return result
         answer = response.json()
         if response.status_code == 200:
             if answer["ok"]:
@@ -51,7 +59,8 @@ class Bot:
         :param raw: dict from telegram API
         :return: (chat_id , message, username, message_id)
         """
-        return [(temp["message"]["chat"]["id"], temp["message"]["text"], temp["message"]["chat"]["username"], temp["message"]["message_id"]) for temp
+        return [(temp["message"]["chat"]["id"], temp["message"]["text"], temp["message"]["chat"]["username"],
+                 temp["message"]["message_id"]) for temp
                 in raw]
 
     def send_message(self, chat_id: int, message: str, reply: int = 0) -> dict:

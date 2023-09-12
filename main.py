@@ -20,9 +20,12 @@ class Bot_logic():
         self._db = db_class.DB(config.DB_USER, config.DB_PASSWORD, config.DB_NAME)
         self._telegram = telegram_class.Bot(config.TOKEN)
         self._chatBot = chatGPT.ChatGPT(update_extension=False)
-        logging.basicConfig(filename='main.log', level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger("chat_bot_logger")
+        self._logger.setLevel(logging.INFO)
+        handler = logging.FileHandler('main_loop.log')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
         try:
             self._logger.info("start selenium")
             self._chatBot.authorization()
@@ -135,7 +138,6 @@ class Bot_logic():
             else:
                 self._logger.error(f"have been unable to get messages {messages['data']}")
                 self._logger.error(f" {messages['errors']}")
-                stop_word = False
             sleep(sleep_time)
         self._logger.info(f"stop working")
 
