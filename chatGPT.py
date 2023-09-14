@@ -40,7 +40,7 @@ class ChatGPT:
                     zp.writestr('manifest.json', extension.manifest_json)
                     zp.writestr('background.js', extension.background_js)
             chrome_options.add_extension('proxy_auth_plugin.zip')
-        chrome_options.add_argument('--window-size=1366,768')
+        chrome_options.add_argument('--window-size=1920,1080')
         chrome_options.add_argument('--start-maximized')
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
